@@ -9,6 +9,7 @@ Original code can be found [here](https://github.com/mariarevythi/RandomWalkLab)
 
 ## Pipeline
 
+
 ### Data Preparation
 
 Input networks are loaded as adjacency matrices (gene, metabolite, etc.)
