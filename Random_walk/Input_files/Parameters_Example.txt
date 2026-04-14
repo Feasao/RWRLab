@@ -1,0 +1,5 @@
+Parameters file (Default values used in the article. Change just the numbers!)	Values
+1. Global Restart Probability (r):	0.7
+2. Inter-Layer Jump Probability (delta):	0.5
+3. Layers Restart Probability - (PPI, PATH, COEX) (tau): 	1,1
+4. Number of Top Genes to be included in the output network (K):	20

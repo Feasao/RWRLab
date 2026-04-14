@@ -3,7 +3,7 @@
 rm(list=ls())
 ##only change this path (setwd) and it should work. If you are having issues also see
 ##other places with paths and input your full path of the files
-setwd("C:/Users/Arago/Documents/GitHub/RandomWalkLab/Random_walk")
+setwd("C:/Users/your_path/RWRLab/Random_walk")
 Network_List <- c("GENES","METABOL")
 #PPI=GENES
 #PATH=METABOL
@@ -32,7 +32,7 @@ source("Functions/CreateNetworks_TopMultiplexHeterogeneous.R")
 print("Reading arguments...")
 args <- commandArgs(trailingOnly = TRUE)
 
-SEED_FOLDER <- "Input_files/TestHealthy"
+SEED_FOLDER <- "Input_files/SeedFolder"
 files <- list.files(SEED_FOLDER, full.names = TRUE)
 for (file in files){
 #All_Seeds <- read.csv("Input_files/Seeds_ExampleNew.txt",header=FALSE,sep="\t",dec=".",stringsAsFactors = FALSE)
@@ -53,7 +53,7 @@ Layers <- vector("list", size)
 for (i in 1:size) {
   if (Network_List[i] == "GENES") {
     
-    GENES_table <- read.table("Networks/gene_networkNew.tsv", sep = "\t", header = TRUE)
+    GENES_table <- read.table("Networks/gene_network.tsv", sep = "\t", header = TRUE)
     GENES_Network <- graph_from_data_frame(GENES_table, directed = FALSE)
     GENES_Network <- igraph::simplify(GENES_Network, remove.multiple = TRUE, remove.loops = TRUE)
     
@@ -63,7 +63,7 @@ for (i in 1:size) {
   } else {
     if (Network_List[i] == "METABOL") {
       
-      METABOLOMICS_table <- read.delim("Networks/mnn.tsv", header = TRUE)
+      METABOLOMICS_table <- read.delim("Networks/metabolite_network.tsv", header = TRUE)
       METABOLOMICS_Network <- graph_from_data_frame(METABOLOMICS_table, directed = FALSE)
       METABOLOMICS_Network <- igraph::simplify(METABOLOMICS_Network, remove.multiple = TRUE, remove.loops = TRUE)
       
@@ -106,7 +106,7 @@ SupraAdjacencyMatrix <- get.supra.adj.multiplexWeightedEN(List_Layers_Allnodes,P
 # Heterogenous (Disease) network
 
 print("Reading the disease-similarity network...")
-Disease_table <- read.table("Networks/diseases_networkNew.csv",sep=",")
+Disease_table <- read.table("Networks/diseases_network.csv",sep=",")
 Disease_Network <- graph_from_data_frame(Disease_table,directed=FALSE)
 Disease_Network <- igraph::simplify(Disease_Network, remove.multiple = TRUE, remove.loops = TRUE)
 AdjMatrix_Diseases <- as_adjacency_matrix(Disease_Network,sparse = TRUE)
@@ -128,7 +128,7 @@ Seed_File_list <- check.seeds(All_Seeds,pool_nodes,rownames(AdjMatrix_Diseases))
 print("Reading Ensemble file with Gene-disease relations from OMIM...")
 Gene_Phenotype_relation <- get.disease.gene.relations(pool_nodes)
 
-Metabolite_Phenotype_relation <- read.delim("Input_files/Metabolite_Disease_relation.txt",sep="\t", header=TRUE, stringsAsFactors=FALSE)
+Metabolite_Phenotype_relation <- read.delim("Input_files/metabolite_disease.txt",sep="\t", header=TRUE, stringsAsFactors=FALSE)
 colnames(Metabolite_Phenotype_relation) <- colnames(Gene_Phenotype_relation)
 Gene_Phenotype_relation <- rbind(Gene_Phenotype_relation, Metabolite_Phenotype_relation)
 
@@ -241,24 +241,24 @@ diseases_map <- c(
 )
 
 ## ----------------------------------------------------------------------------------------------------------------------------------
-#final_rank_proteins <- rank_proteins(N, L,Random_Walk_Results,Gene_Seeds)
+final_rank_proteins <- rank_proteins(N, L,Random_Walk_Results,Gene_Seeds)
 final_rank_diseases <- rank_diseases(N,L,M,Random_Walk_Results,Disease_Seeds)
 final_rank_diseases$DiseaseName <-diseases_map[as.character(final_rank_diseases$DiseaseID)]
 
-out_name <- paste0( "result_EN0.01_", basename(file))
-out_path <- file.path("Test_resultsHealthy/", out_name)
+out_name <- paste0( "result_", basename(file))
+out_path <- file.path("Test_results/", out_name)
 ## ----------------------------------------------------------------------------------------------------------------------------------
-#write.table(final_rank_proteins,file="final_rank_proteins.txt",sep="\t",row.names = FALSE, dec=".",quote=FALSE)
+write.table(final_rank_proteins,file="final_rank_proteins.txt",sep="\t",row.names = FALSE, dec=".",quote=FALSE)
 write.table(final_rank_diseases,file=out_path,sep="\t",row.names = FALSE, dec=".",quote=FALSE)
 
 
 ## ----------------------------------------------------------------------------------------------------------------------------------
-#print("Creating Network file with the top candidates...")
-#Top_Results_Network <- CreateNetworks_TopMultiplexHeterogeneous(Network_List,c(Gene_Seeds,Disease_Seeds),
-#                                                                final_rank_proteins$GeneNames[1:Parameters$k],final_rank_diseases$DiseaseID[1:Parameters$k])
+print("Creating Network file with the top candidates...")
+Top_Results_Network <- CreateNetworks_TopMultiplexHeterogeneous(Network_List,c(Gene_Seeds,Disease_Seeds),
+                                                                final_rank_proteins$GeneNames[1:Parameters$k],final_rank_diseases$DiseaseID[1:Parameters$k])
 
 
 ## ----------------------------------------------------------------------------------------------------------------------------------
-#write.table(as_data_frame(Top_Results_Network, what = c("edges", "vertices", "both")), file = "Final_network.txt", 
-#            sep=" ", quote=FALSE,row.names=FALSE)
+write.table(as_data_frame(Top_Results_Network, what = c("edges", "vertices", "both")), file = "Final_network.txt", 
+            sep=" ", quote=FALSE,row.names=FALSE)
 }
